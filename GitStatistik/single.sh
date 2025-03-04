@@ -2,15 +2,21 @@
 
 # Check if required parameters are provided
 if [ -z "$1" ]; then
-  echo "ATTENTION Usage: $0 <date> <foldername>"
+  echo "ATTENTION Usage: $0 <datefrom> <dateto> <foldername>"
   exit 1
 else 
-  vdate="$1"
+  fromDate="$1"
+  toDate="$2"
+  folder="$3"
 fi
 
 
-echo "User $2"
-echo "Date $vdate"
+
+cd "$folder"
+
+echo "User $folder"
+echo "Date $fromDate"
+echo "To Date $toDate"
 
 echo ""
 echo "pulling repo"
@@ -19,15 +25,16 @@ git pull
 echo ""
 
 echo ""
-echo "all commits...since $vdate"
-git log --since="$vdate" --format="%H"
+echo "all commits...since $fromDate"
+git log --since="$fromDate" --until="$toDate" --format="%H"
 echo ""
 
+
 TEMP_OUTPUT_FILE="changes_temp_$1.txt"
-git log --since="$vdate" --format="%H" | while read commit_hash; do git show  "$commit_hash" ; done > "$TEMP_OUTPUT_FILE"
+git log --since="$fromDate" --until="$toDate" --format="%H" | while read commit_hash; do git show  "$commit_hash" ; done > "$TEMP_OUTPUT_FILE"
 
 # # Get the commit hash since the provided date
-# OLDEST_COMMIT=$(git log --since="$vdate" --format="%H" | tail -1)
+# OLDEST_COMMIT=$(git log --since="$fromDate" --format="%H" | tail -1)
 # echo "Oldest commit: $OLDEST_COMMIT"
 
 # # Temporary output file for diff
@@ -41,8 +48,7 @@ ADDED_LINES=$(grep -E "^\+" "$TEMP_OUTPUT_FILE" | grep -vcE "^\+\+\+")
 REMOVED_LINES=$(grep -E "^-" "$TEMP_OUTPUT_FILE" | grep -vcE "^---")
 
 # Final output file including added lines in name, saving to parent folder
-mkdir "../0_History/${vdate}"
-OUTPUT_FILE="../0_History/${vdate}/${2%/}_${vdate}_added_${ADDED_LINES}.diff"
+OUTPUT_FILE="../${folder%/}_${fromDate}_to_${toDate}_added_${ADDED_LINES}.diff"
 mv "$TEMP_OUTPUT_FILE" "$OUTPUT_FILE"
 
 # Display results
