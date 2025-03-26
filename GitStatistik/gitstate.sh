@@ -41,7 +41,7 @@ ADDED_LINES=$(grep -E "^\+" "$TEMP_OUTPUT_FILE" | grep -vcE "^\+\+\+")
 REMOVED_LINES=$(grep -E "^-" "$TEMP_OUTPUT_FILE" | grep -vcE "^---")
 
 # Final output file including added lines in name, saving to parent folder
-mkdir "../0_History/${vdate}"
+mkdir -p "../0_History/${vdate}"
 OUTPUT_FILE="../0_History/${vdate}/${2%/}_${vdate}_added_${ADDED_LINES}.diff"
 mv "$TEMP_OUTPUT_FILE" "$OUTPUT_FILE"
 
